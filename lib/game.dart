@@ -1,33 +1,34 @@
-import 'dart:ffi';
 //import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
 
 
 import 'package:tictactoe/Piece.dart';
+import 'package:tictactoe/position.dart';
 
 class Game {
 
-  List<List<Piece>> _gameboard = [];
+  final List<List<Piece>> _gameboard = [];
 
   PieceType turn = PieceType.cross;
 
   late Piece _currentPiece;
+  late List<int> _currentPosition;
 
   int rows = 1;
   int columns = 1;
 
   Game(int multiplier)
   {
-    this.rows = multiplier;
-    this.columns = multiplier;
+    rows = multiplier;
+    columns = multiplier;
 
-    _currentPiece = Piece(turn);
+    //_currentPiece = Piece(turn);
 
     setupBoard();
   }
 
   void setupBoard() {
     for (int column = 0; column < columns; column++) {
-      _gameboard.add(createRow());
+      _gameboard.add(createRow(column));
     }
   }
 
@@ -36,33 +37,34 @@ class Game {
   }
 
   /// creates a list of empty pieces.
-  List<Piece>  createRow() {
+  List<Piece>  createRow(int column) {
     List<Piece> pieces = [];
 
     for (int i = 0; i < rows; i++) {
-      pieces.add(Piece(PieceType.empty));
+      pieces.add(Piece(PieceType.empty, Position(i,column)));
     }
     return pieces;
   }
 
   //updates the cell at position [x,x] to the correct type.
-  void place(List<int> position) {
-    if (canPlace()) {
+  bool tryPlace(List<int> position) {
+    _currentPiece =  _gameboard
+          .elementAt(_currentPosition[0])
+          .elementAt(_currentPosition[1]);
 
-      _gameboard
-          .elementAt(position[0])
-          .elementAt(position[1])
-          .updatePiece(turn);
+    if (canPlace()) {
+     _currentPiece.updatePiece(turn);
 
       changeTurn();
-    }
 
+      return true;
+    }
+    return false;
   }
 
 
-  bool canPlace() {
-
-    return true;
+  bool canPlace() {    
+    return _currentPiece.type != PieceType.empty;
   }
 
   void changeTurn() {
@@ -72,6 +74,7 @@ class Game {
       turn = PieceType.circle;
     }
   }
+
 
 //0  0  0
 //0  0  0
@@ -86,15 +89,7 @@ class Game {
 //O  0  X
 }
 
-class Position {
-  int row = 0;
-  int column = 0;
 
-  public(int row, int column) {
-    this.row = row;
-    this.column = column;
-  }
-}
 
 enum Turn {
   circle,
