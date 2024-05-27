@@ -1,17 +1,21 @@
 //import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
 
 
-import 'package:tictactoe/Piece.dart';
-import 'package:tictactoe/position.dart';
+
+import 'package:tic_tac_toe/position.dart';
+
+import 'Piece.dart';
 
 class Game {
 
-  final List<List<Piece>> _gameboard = [];
+  final length = 9;
+  //final List<List<Piece>> _gameboard = [];
+  final List<Piece> _gameboard = [];
 
   PieceType turn = PieceType.cross;
 
   late Piece _currentPiece;
-  late List<int> _currentPosition;
+  late int _currentPosition;
 
   int rows = 1;
   int columns = 1;
@@ -25,14 +29,18 @@ class Game {
 
     setupBoard();
   }
-
-  void setupBoard() {
-    for (int column = 0; column < columns; column++) {
-      _gameboard.add(createRow(column));
+void setupBoard() {
+    for (int i = 0; i < length; i++) {
+      _gameboard.add(Piece(PieceType.empty, i));
     }
   }
+  // void setupBoard() {
+  //   for (int column = 0; column < columns; column++) {
+  //     _gameboard.add(createRow(column));
+  //   }
+  // }
 
-  List<List<Piece>> getBoard() {
+  List<Piece> getBoard() {
     return _gameboard;
   }
 
@@ -41,16 +49,15 @@ class Game {
     List<Piece> pieces = [];
 
     for (int i = 0; i < rows; i++) {
-      pieces.add(Piece(PieceType.empty, Position(i,column)));
+      pieces.add(Piece(PieceType.empty, i));
     }
     return pieces;
   }
 
   //updates the cell at position [x,x] to the correct type.
-  bool tryPlace(List<int> position) {
+  bool tryPlace(int position) {
     _currentPiece =  _gameboard
-          .elementAt(_currentPosition[0])
-          .elementAt(_currentPosition[1]);
+          .elementAt(position);
 
     if (canPlace()) {
      _currentPiece.updatePiece(turn);
@@ -62,16 +69,35 @@ class Game {
     return false;
   }
 
+  bool _isNotEmpty(Piece piece) => piece.type != PieceType.empty; 
 
   bool canPlace() {    
-    return _currentPiece.type != PieceType.empty;
+    return _currentPiece.type == PieceType.empty;
   }
 
   void changeTurn() {
+    
+    int count = 0;
+    for (var piece in _gameboard) {
+      if (piece.type == PieceType.empty) {
+        count++;
+      }
+    }
+
+    if (count == 0) {
+      _endGame();
+    }
+
     if (turn == PieceType.circle) {
       turn = PieceType.cross;
     } else {
       turn = PieceType.circle;
+    }
+  }
+  
+  void _endGame() {
+    for (var piece in _gameboard) {
+      piece.type = PieceType.empty;
     }
   }
 

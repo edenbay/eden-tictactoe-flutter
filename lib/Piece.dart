@@ -1,18 +1,16 @@
 
-import 'package:tictactoe/position.dart';
+import 'package:tic_tac_toe/position.dart';
+
+
 
 enum PieceType { empty, circle, cross }
 
 class Piece {
 
   PieceType type = PieceType.empty;
-  late Position position;
+  late int position;
 
-  Piece(PieceType type, Position position) 
-  { 
-    this.type = type;
-    this.position = position;
-  }
+  Piece(this.type, this.position);
 
    Piece updatePiece(PieceType pieceType) {
     type = pieceType;
@@ -20,6 +18,15 @@ class Piece {
     return this;
   }
 
+  //static PieceType getType(Piece piece) => piece.type;
+
+  
+
 }
 
+extension PieceGetter on Piece {
+  PieceType getType() {
+    return this.type;
+  }
+}
 
