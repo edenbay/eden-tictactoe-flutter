@@ -1,4 +1,5 @@
 
+import 'package:flutter/widgets.dart';
 import 'package:tic_tac_toe/Piece.dart';
 
 import 'game.dart';
@@ -6,7 +7,6 @@ import 'game.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'position.dart';
 
 
 
@@ -53,9 +53,9 @@ class MyHomePage extends State<NaviBar> {
 
     switch (currentPageIndex) {
       case 0:
-      page = GamePage();
+      page = const GamePage();
       case 1:
-      page = const Placeholder();
+      page = const StatisticsPage();
       default:
       throw UnimplementedError('no widget found for $currentPageIndex');
     }
@@ -71,14 +71,14 @@ class MyHomePage extends State<NaviBar> {
             ),
           ),         
           NavigationBar(
-              destinations: [
-                const NavigationDestination(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.gamepad),
+                  label: 'Tic Tac Toe',
                 ),
-                const NavigationDestination(
-                  icon: Icon(Icons.favorite),
-                  label: 'Favorites',
+                NavigationDestination(
+                  icon: Icon(Icons.wysiwyg),
+                  label: 'Statistics',
                 ),
               ],
               selectedIndex: currentPageIndex,
@@ -97,55 +97,98 @@ class MyHomePage extends State<NaviBar> {
 }
 
 class GamePage extends StatelessWidget {
+  const GamePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var board = appState.gameBoard;
 
-    late IconData icon;
 
-      icon = 
-     Icons.favorite;
-
-
-
-    //  IconData getIconFromType(PieceType type) {
-    // switch (type) {
-    //   case PieceType.circle:
-    //     return Icons.circle;
-    //   case PieceType.cross:
-    //     return Icons.close;
-    //   default:
-    //     return Icons.abc;
-    //}
-  //}
-
-
-      return Center(
-        child: GridView.builder(
-          gridDelegate: 
-          const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 1),
-          itemCount: board.length,
-          itemBuilder: (BuildContext context, index) {
-            var piece = board[index];                 
-          return InkWell(          
-            child:    
-            BigCard(
-              key: Key('${index}'),
-             piece: piece),
-             onTap: () {
-                  appState.place(piece.position);
-                },         
-                
-              );
-          },                                
-        )
+    return 
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center, 
+            children: <Widget> [
+              Expanded(
+                child: GridView.builder(
+                      gridDelegate: 
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 1),
+                      itemCount: board.length,
+                      itemBuilder: (BuildContext context, index) {
+                        var piece = board[index];                 
+                      return InkWell(          
+                        child:    
+                        BigCard(
+                          key: Key('$index'),
+                        piece: piece),
+                        onTap: () {
+                              appState.place(piece.position);
+                            },           
+                          );
+                      },                                
+                    ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child:  Text('hello'),
+                ),                
+            ],                              
     );
+    }
+    //   return Center(       
+    //     child:
+    //         GridView.builder(
+    //               gridDelegate: 
+    //               const SliverGridDelegateWithFixedCrossAxisCount(
+    //                 crossAxisCount: 3,
+    //                 crossAxisSpacing: 1),
+    //               itemCount: board.length,
+    //               itemBuilder: (BuildContext context, index) {
+    //                 var piece = board[index];                 
+    //               return InkWell(          
+    //                 child:    
+    //                 BigCard(
+    //                   key: Key('$index'),
+    //                 piece: piece),
+    //                 onTap: () {
+    //                       appState.place(piece.position);
+    //                     },           
+    //                   );
+    //               },                                
+    //             ),             
+    // );
+
+  
+}
+
+class StatisticsPage extends StatelessWidget {
+  const StatisticsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var results = appState.results;
+
+      return SafeArea(
+        child:
+          ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: results.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                height: 50,
+                color: Colors.amber,
+                child: Center(child: Text(appState.fetchResult(index))),
+              );
+            },
+          )   
+        );
 
   }
 }
+
 
 class BigCard extends StatelessWidget {
   const BigCard({
@@ -171,9 +214,8 @@ var style = theme.textTheme.displayMedium!.copyWith(
       child: Padding(
         padding: const EdgeInsets.all(25.0),
         child:
-           appState.getIconFromType(piece.getType()),
+          appState.getIconFromType(piece.getType()),
         ),
-
         );
   }
 }
@@ -182,27 +224,41 @@ var style = theme.textTheme.displayMedium!.copyWith(
 
 class MyAppState extends ChangeNotifier {
 
-static Game _game = Game(3);
+static final Game _game = Game(3);
+
+
 
 Icon getIconFromType(PieceType type) {
+  const double size = 75.0;
+  
+
     switch (type) {
       case PieceType.circle:
-        return Icon(Icons.circle);
+        return const Icon(Icons.circle, size: size);
       case PieceType.cross:
-        return Icon(Icons.close);
+        return const Icon(Icons.close, size: size);
       default:
-        return Icon(null);
+        return const Icon(null);
     }      
   }
 
 
 var gameBoard = _game.getBoard();
+var results = _game.getResults();
+
   void place(int position) {
       var  success = _game.tryPlace(position);
       print(success);
       print(position);
       print(_game.turn);
       notifyListeners();   
+    }
+
+    String fetchResult(int index) {
+      var cross = results[index] == true ? 'win' : 'loss';
+      var circle = results[index] == false ? 'win' : 'loss';
+
+      return 'Cross: ${cross} | Circle: ${circle}';
     }
 }
 
