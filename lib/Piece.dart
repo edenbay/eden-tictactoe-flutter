@@ -24,7 +24,7 @@ class Piece {
 
   void setGridPosition(Position pos) {
 
-    if (gridPosition.length == 0) {
+    if (gridPosition.isEmpty) {
       gridPosition.add(pos.row);
       gridPosition.add(pos.column);
     }

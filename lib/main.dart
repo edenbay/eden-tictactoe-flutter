@@ -1,6 +1,5 @@
 
-import 'package:flutter/widgets.dart';
-import 'package:tic_tac_toe/Piece.dart';
+import 'package:tic_tac_toe/piece.dart';
 
 import 'game.dart';
 
@@ -130,37 +129,14 @@ class GamePage extends StatelessWidget {
                       },                                
                     ),
               ),
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(8.0),
                 child:  Text('hello'),
                 ),                
             ],                              
     );
     }
-    //   return Center(       
-    //     child:
-    //         GridView.builder(
-    //               gridDelegate: 
-    //               const SliverGridDelegateWithFixedCrossAxisCount(
-    //                 crossAxisCount: 3,
-    //                 crossAxisSpacing: 1),
-    //               itemCount: board.length,
-    //               itemBuilder: (BuildContext context, index) {
-    //                 var piece = board[index];                 
-    //               return InkWell(          
-    //                 child:    
-    //                 BigCard(
-    //                   key: Key('$index'),
-    //                 piece: piece),
-    //                 onTap: () {
-    //                       appState.place(piece.position);
-    //                     },           
-    //                   );
-    //               },                                
-    //             ),             
-    // );
-
-  
+      
 }
 
 class StatisticsPage extends StatelessWidget {
@@ -226,8 +202,6 @@ class MyAppState extends ChangeNotifier {
 
 static final Game _game = Game(3);
 
-
-
 Icon getIconFromType(PieceType type) {
   const double size = 75.0;
   
@@ -243,11 +217,11 @@ Icon getIconFromType(PieceType type) {
   }
 
 
-var gameBoard = _game.getBoard();
-var results = _game.getResults();
+List<Piece> gameBoard = _game.getBoard();
+List<PieceType> results = _game.getResults();
 
   void place(int position) {
-      var  success = _game.tryPlace(position);
+      var success = _game.tryPlace(position);
       print(success);
       print(position);
       print(_game.turn);
@@ -255,10 +229,29 @@ var results = _game.getResults();
     }
 
     String fetchResult(int index) {
-      var cross = results[index] == true ? 'win' : 'loss';
-      var circle = results[index] == false ? 'win' : 'loss';
+      
+      
 
-      return 'Cross: ${cross} | Circle: ${circle}';
+      String win = 'Win';
+      String loss = 'Loss';
+
+      String cross = loss;
+      String circle = loss;
+
+      var winType = results[index];
+        
+      switch (winType) {
+        case PieceType.empty:
+          break;
+        case PieceType.circle:
+          circle = win;
+          break;
+        case PieceType.cross:
+          cross = win;
+          break;
+      }
+        
+      return 'Cross: $cross | Circle: $circle';
     }
 }
 

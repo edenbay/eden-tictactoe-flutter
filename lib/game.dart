@@ -3,10 +3,9 @@
 
 
 
-import 'package:english_words/english_words.dart';
 import 'package:tic_tac_toe/position.dart';
 
-import 'Piece.dart';
+import 'piece.dart';
 
 class Game {
 
@@ -27,14 +26,7 @@ class Game {
   int crosses = 0;
   int circles = 0;
 
-  List<bool> results = [];
-
-  
-
-
-
-
-
+  List<PieceType> results = [];
 
   Game(int multiplier)
   {
@@ -44,13 +36,7 @@ class Game {
     setupBoard();
   }
 
-
-
-
-
-
-
-    void setupBoard() {
+  void setupBoard() {
     for (int i = 0; i < length; i++) {
       _gameboard.add(Piece(PieceType.empty, i));
     }
@@ -71,7 +57,7 @@ class Game {
 
 
 
-  List<bool> getResults() => results;
+  List<PieceType> getResults() => results;
 
   List<Piece> getBoard() => _gameboard;
   
@@ -104,9 +90,9 @@ class Game {
 
   bool _isNotEmpty(Piece piece) => piece.type != PieceType.empty; 
 
-  bool canPlace() {    
-    return _currentPiece.type == PieceType.empty;
-  }
+  bool canPlace() =>  
+    _currentPiece.type == PieceType.empty;
+  
 
   void changeTurn() {
     
@@ -117,7 +103,7 @@ class Game {
       }
     }
 
-    if (count == 0 || _checkWin().$1 == true) {
+    if (count == 0 || _checkWin() != PieceType.empty) {
       _endGame();
     }
 
@@ -140,7 +126,7 @@ class Game {
     }
   }
 //skapa en gridList, gå sedan igenom gridList och gameboard och jämför dem, skiljs något, ändra den: gridList[i,j] = _gameboard[index];
-  (bool, PieceType) _checkWin() {
+  PieceType _checkWin() {
 
     var winningType = PieceType.empty;
     var hasWon = false;
@@ -163,22 +149,122 @@ class Game {
         if (crossCount >= 3) {
         winningType = PieceType.cross;
         hasWon = true;
-        results.add(true);
         break;
       }
 
       if (circleCount >= 3) {
         winningType = PieceType.circle;
         hasWon = true;
-        results.add(false);
         break;
       }
       }
         
       
     }
-      print('you have won: ${hasWon}, type is: ${winningType}');
-      return (hasWon, winningType);
+
+    for (int column = 0; column < 3; column++) {
+      int crossCount = 0;
+      int circleCount = 0;
+      for (int row = 0; row < 3; row++) {
+        var piece =_gridList[row][column];
+        switch (piece.type) {
+          case PieceType.circle:
+            circleCount++;
+            break;
+          case PieceType.cross:
+            crossCount++;
+            break;
+          default:
+            continue;
+        }
+
+        if (crossCount >= 3) {
+        winningType = PieceType.cross;
+        hasWon = true;
+        break;
+      }
+
+      if (circleCount >= 3) {
+        winningType = PieceType.circle;
+        hasWon = true;
+        break;
+      }
+      }
+        
+      
+    }
+    int crossCount = 0;
+    int circleCount = 0;
+    for (int column = 0; column < 3; column++) {
+      
+      var row = column;
+        var piece =_gridList[row][column];
+        switch (piece.type) {
+          case PieceType.circle:
+            circleCount++;
+            break;
+          case PieceType.cross:
+            crossCount++;
+            break;
+          default:
+            continue;
+        }
+
+        if (crossCount >= 3) {
+        winningType = PieceType.cross;
+        break;
+      }
+
+      if (circleCount >= 3) {
+        winningType = PieceType.circle;
+        hasWon = true;
+        break;
+      
+      }
+        
+      
+    }
+
+    crossCount = 0;
+    circleCount = 0;
+    var row = 0;
+    for (int column = 2; column >= 0; column--) {
+      
+      
+        var piece =_gridList[row][column];
+        switch (piece.type) {
+          case PieceType.circle:
+            circleCount++;
+            break;
+          case PieceType.cross:
+            crossCount++;
+            break;
+          default:
+            continue;
+        }
+        row++;
+
+        if (crossCount >= 3) {
+        winningType = PieceType.cross;
+        hasWon = true;    
+        break;
+      }
+
+      if (circleCount >= 3) {
+        winningType = PieceType.circle;
+        hasWon = true;    
+        break;
+      
+      }
+              
+    }
+
+      if (hasWon) {
+        results.add(winningType);
+      }
+      
+      print('you have won: $hasWon, type is: $winningType');
+      return (winningType);
     }
   
 
@@ -214,24 +300,4 @@ class Game {
     .elementAt(piece.gridPosition[1])
     .type = piece.type;
   }
-}
-
-//0  0  0
-//0  0  0
-//0  0  0
-
-//X  0  0
-//0  X  0
-//0  0  X
-
-//X  0  O
-//O  X  0
-//O  0  X
-
-
-
-
-enum Turn {
-  circle,
-  cross
 }
