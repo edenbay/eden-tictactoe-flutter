@@ -1,499 +1,179 @@
-import 'dart:math';
 
-import 'direction.dart';
-import 'position.dart';
+import 'dart:js_interop';
 
 import 'piece.dart';
 
+import 'piece_type.dart';
+
+
+
 class GridChecker {
 
-  //Gör globala piece, globala board.
-  static late List<List<Piece>> _gameBoard;
-  static late Piece _piece;
-  static late List<PieceType> results = [];
+  List<List<Piece>> _horizontals = [];
+  List<List<Piece>> _verticals = [];
+  List<List<Piece>> _diagonals = [];
 
-  static List<Position> get(List<List<Piece>> board)
-  {
-      late List<Position> moveset = [];
+  List<List<List<Piece>>> _allDirections = [];
 
-      setGlobals(board);
-      
-      moveset = getMoveset(_piece);
+  late int _amount;
+  late int _chunks;
 
-      return moveset;
-  }       
 
-  static void setGlobals(List<List<Piece>> board)
-  {
-      _gameBoard = board;
-      _piece = _gameBoard[0][0];
+  void setValues(List<Piece> pieces, int amount) {
+    _amount = amount;
+    _chunks = (pieces.length / _amount).ceil();
+
+    _horizontals = horizontalChunks(pieces);
+    _verticals = verticalChunks(_horizontals);
+    _diagonals = diagonalChunks(pieces);  
   }
 
-  static List<Position> getMoveset(Piece piece)
-  {
-    late List<Position> moveset = [];
-
-    var diagonals = Direction.getDiagonals();
-
-      for (Direction direction in diagonals)
-      {
-          diagonal(direction)
-                  .forEach((position) => moveset.add(position));
-      }
-  
-    var straights = Direction.getStraights();
-
-      for (Direction direction in straights)
-      {
-          straight(direction)
-                  .forEach((position) => moveset.add(position));
-      }
-                 
-
-      return moveset;
+  PieceType retrieveWinner(List<Piece> pieces, int amount) {
+    setValues(pieces, amount);
+    return checkChunks();
   }
-
-
-
-
-  PieceType _checkWin() {
-
-    var winningType = PieceType.empty;
-    var hasWon = false;
-
-
-
-    //0 0 0
-    for (int row = 0; row < 3; row++) {
-      int crossCount = 0;
-      int circleCount = 0;
-      for (int column = 0; column < 3; column++) {
-        var piece =_gameBoard[row][column];
-        switch (piece.type) {
-          case PieceType.circle:
-            circleCount++;
-            break;
-          case PieceType.cross:
-            crossCount++;
-            break;
-          default:
-            continue;
-        }
-
-        if (crossCount >= 3) {
-        winningType = PieceType.cross;
-        hasWon = true;
-        break;
-      }
-
-      if (circleCount >= 3) {
-        winningType = PieceType.circle;
-        hasWon = true;
-        break;
-      }
-      }
-        
-      
-    }
-    //0
-    //0
-    //0
-    for (int column = 0; column < 3; column++) {
-      int crossCount = 0;
-      int circleCount = 0;
-      for (int row = 0; row < 3; row++) {
-        var piece =_gameBoard[row][column];
-        switch (piece.type) {
-          case PieceType.circle:
-            circleCount++;
-            break;
-          case PieceType.cross:
-            crossCount++;
-            break;
-          default:
-            continue;
-        }
-
-        if (crossCount >= 3) {
-        winningType = PieceType.cross;
-        hasWon = true;
-        break;
-      }
-
-      if (circleCount >= 3) {
-        winningType = PieceType.circle;
-        hasWon = true;
-        break;
-      }
-      }
-        
-      
-    }
-
-
-    //0
-    //  0
-    //    0
-    int crossCount = 0;
-    int circleCount = 0;
-    for (int column = 0; column < 3; column++) {
-      
-      var row = column;
-        var piece =_gameBoard[row][column];
-        switch (piece.type) {
-          case PieceType.circle:
-            circleCount++;
-            break;
-          case PieceType.cross:
-            crossCount++;
-            break;
-          default:
-            continue;
-        }
-
-        if (crossCount >= 3) {
-        winningType = PieceType.cross;
-        break;
-      }
-
-      if (circleCount >= 3) {
-        winningType = PieceType.circle;
-        hasWon = true;
-        break;
-      
-      }
-        
-      
-    }
-
-    //    0
-    //  0
-    //0
-    crossCount = 0;
-    circleCount = 0;
-    var row = 0;
-    for (int column = 2; column >= 0; column--) {
-      
-      
-        var piece =_gameBoard[row][column];
-        switch (piece.type) {
-          case PieceType.circle:
-            circleCount++;
-            break;
-          case PieceType.cross:
-            crossCount++;
-            break;
-          default:
-            continue;
-        }
-        row++;
-
-        if (crossCount >= 3) {
-        winningType = PieceType.cross;
-        hasWon = true;    
-        break;
-      }
-
-      if (circleCount >= 3) {
-        winningType = PieceType.circle;
-        hasWon = true;    
-        break;
-      
-      }
-              
-    }
-
-      if (hasWon) {
-        results.add(winningType);
-      }
-      
-      print('you have won: $hasWon, type is: $winningType');
-      return (winningType);
-    }
-
-  /// <summary>
-  /// Gets all possible diagonal moves for the piece with the specified direction.
-  /// </summary>
-  /// <param name="piece"></param>
-  /// <param name="board"></param>
-  /// <param name="direction"></param>
-  /// <returns>A list of all possible diagonal moves for the specified direction</returns>
-  static List<Position> diagonal(Direction direction)
-  {
-      //creates temporary moveset list
-      late List<Position> moveset = [];
-
-      //saves the origin position.
-      var origo = Position(_piece.gridPosition[0], _piece.gridPosition[1]);
-
-      //saves the directional offsets.
-      int rowOffset = direction.rowOffset;
-      int columnOffset = direction.columnOffset;
-
-      //saves the square root of the board's length as a "constant"
-      int upperbound = sqrt(_gameBoard.length) as int;
-
-      //sets the value to the upperbound if rowOffset is greater than 0, 0 if not.
-      int comparingValue = (rowOffset > 0)
-                        ? upperbound
-                        : 0;
-
-      //initializes the column
-      var column = -1;
-
-      for (int row = origo.row; diagonalIteration(row, comparingValue); row += rowOffset)
-      {
-          //checks if the column's value is less than 0 and sets its initial value.
-          if (column < 0) {
-              column = origo.column;
-          }
-
-          var position = Position(row, column);
-
-          if (outOfBounds(position, upperbound, direction)) {
-            break;
-          }
-              
-          (bool, Position) isnull = isNull(position, direction, position);
-
-          if (isnull.$1)
-          {
-              position = isnull.$2;
-              moveset.add(position);
-              column += columnOffset;
-          }
-          else {
-              break;
-          }
-      }
-
-      return moveset;
-  }
-
-    bool checkStraights(PieceType thisType, Direction direction) {
-      
-      //kolla hellre detta i överordnade metoden.
-      var winningType = PieceType.empty;
-
-
-      bool hasWon = false;  
-      
-      //kan välja vilken piecetype som ska kollas
-      //eftersom båda kollar samma typ av värde
-
-      for (int row = 0; row < 3; row++) {
-      int typeCount = 0;
-
-      for (int column = 0; column < 3; column++) {
-        var piece =_gameBoard[row][column];
-        
-          if (piece.type == thisType) {
-            typeCount++;
-          }
-        }
-
-        if (typeCount >= 3) {
-        winningType = thisType;
-        hasWon = true;
-        break;
-      }
-
-      
-      }
-        
-      return hasWon;
-    }
-  
 
   
-  /// <summary>
-  /// Gets all possible straight moves for the piece with the specified direction.
-  /// </summary>
-  /// <param name="piece"></param>
-  /// <param name="board"></param>
-  /// <param name="direction"></param>
-  /// <returns>A list of all possible straight moves for the specified direction</returns>
-  static List<Position> straight(Direction direction)
-  {
-      //creates temporary moveset list
-      late List<Position> moveset = [];
-
-      //saves the origin position.
-      var origo = Position(_piece.gridPosition[0], _piece.gridPosition[1]);
-
-      //saves the directional offsets.
-      (int left, int right) offset = (direction.rowOffset, direction.columnOffset);
-
-      //splits up the origin row and column.
-      (int left, int right) coord = (origo.row, origo.column);
-
-      int startvalue = coord.$1;
-      int row = coord.$1;
-      int column = coord.$2;
-
-      //swaps out the tuple values if the direction does not affect rows.
-
-      bool isRow = isUpOrDown(direction);
-
-      if (!isRow)
-      {
-          coord = swapValues(coord);
-          offset = swapValues(offset);
-          row = coord.$2;
-          column = coord.$1;
-          startvalue = coord.$2;
-      }
-      
-      //saves the square root of the board's length as a "constant"
-      int upperbound = sqrt(_gameBoard.length) as int;
-
-      //sets the value to the upperbound if offset.one is greater than 0, 0 if not.
-      int comparingValue = (offset.$1 > 0)
-                        ? upperbound
-                        : 0;
-
-      for (int rowOrColumn = startvalue; straightIteration(rowOrColumn, comparingValue); rowOrColumn += offset.$1)
-      {
-          if (isRow) {
-            row = rowOrColumn;
-          }                   
-          else {
-                column = rowOrColumn; 
-          }
-
-
-          var position = Position(row, column);
-
-          if (outOfBounds(position, upperbound, direction)) {
-              break;
-          }
-              
-          (bool, Position) isnull = isNull(position, direction, position);
-
-          if (isnull.$1) {
-              position = isnull.$2;
-              moveset.add(position);
-          }                   
-          else {
-              break;  
-          }
-              
-      }
-
-      return moveset;
+  List<PieceType> _getPlayerTypes() {
+    return [
+      PieceType.cross,
+      PieceType.circle
+    ];
   }
 
+  List<List<List<Piece>>> _getAllDirections() => [
+    _horizontals,
+    _verticals,
+    _diagonals
+  ];
 
-
-  /// <summary>
-  /// Swaps the values in a tuple.
-  /// </summary>
-  /// <typeparam name="T"></typeparam>
-  /// <param name="values"></param>
-  /// <returns></returns>
-  static (T, T) swapValues<T>((T, T) values) =>
-              values = (values.$2, values.$1);
+  bool allAreOfTypeIn(List<List<Piece>> pieces, PieceType type) =>
+                            pieces.any((pieces) => 
+                            pieces.every((piece) 
+                            => piece.type == type));  
   
 
-  /// <summary>
-  /// Checks if a direction is up or down.
-  /// </summary>
-  /// <param name="direction"></param>
-  /// <returns>true if direction is up or down</returns>
-  static bool isUpOrDown(Direction direction) 
-      => direction.rowOffset != 0;
+  PieceType checkChunks() {
 
-  /// <summary>
-  /// Gets the diagonal iteration bool.
-  /// </summary>
-  /// <param name="value"></param>
-  /// <param name="upperbound"></param>
-  /// <returns></returns>
-  static bool diagonalIteration(int value, [int upperbound = 0])
-  {
-      bool validator = (upperbound == 0)
-                  ? value > 0
-                  : value < upperbound - 1;
+    PieceType result = PieceType.empty;
 
-      return validator;
+    for (var chunks in _getAllDirections()) {
+      for (var type in _getPlayerTypes()) {
+        if (allAreOfTypeIn(chunks, type)) {
+          result = type;
+          break;
+        }    
+      }  
+    }
+    
+
+    return result;
+  }
+  //se till att bara använda dessa om circle >= 3 || cross >= 3;
+  
+  List<List<Piece>> horizontalChunks(List<Piece> pieces) {
+    return List.generate(_chunks, 
+    (i) => pieces.skip(i * _amount).take(_amount).toList());
   }
 
-  /// <summary>
-  /// Gets the straight iteration bool.
-  /// </summary>
-  /// <param name="value"></param>
-  /// <param name="upperbound"></param>
-  /// <returns>true if idk</returns>
-  static bool straightIteration(int value, [int upperbound = 0])
-  {
-      bool validator = (upperbound == 0)
-                  ? value >= 0
-                  : value <= upperbound - 1;
+  /// turns a 2d array of pieces into [size] amount of vertical chunks. 
+  List<List<Piece>> verticalChunks(List<List<Piece>> pieces) {
+    
+    List<List<Piece>> verticalSlices = [];
 
-      return validator;
+    for (int col = 0; col < _amount; col++) {
+        List<Piece> column = [];
+      for (int row = 0; row < _amount; row++) {
+        column.add(pieces[row][col]);
+      }
+      verticalSlices.add(column);
+    }
+
+    return verticalSlices;
   }
 
+  //retrieves all cells in a dual diagonal cross pattern.
+  List<List<Piece>> diagonalChunks(List<Piece> pieces) {
+    List<List<Piece>> diagonalSlice = [];
+    ///en lista med två underlistor.
+    /// Behöver hamna i samma lista: [[2, 4, 6],
+    ///                               [0, 4, 8]]
+    /// 
+    /// 0
+    ///   0
+    ///     0
+    /// 
+    ///     0
+    ///   0
+    /// 0
+    /// 
+    // var list = List.generate(_chunks, 
+    // (i) => pieces.skip(i * 4).take(_amount).toList()[0]);
 
-  /// <summary>
-  /// Checks whether or not a cell in a straight move  is empty and the offset position.
-  /// </summary>
-  /// <param name="board"></param>
-  /// <param name="position"></param>
-  /// <param name="direction"></param>
-  /// <returns>True if cell is empty.</returns>
-  static (bool, Position) isNull(Position position, Direction direction, Position nextPosition)
-  {
-      nextPosition = getOffsetPosition(position, direction);
-      bool result = true;
-      
-      if (_gameBoard[nextPosition.row][nextPosition.column].type != PieceType.empty)
-      {
-        result = false;
+    // diagonalSlice.add(list); 
+    // int pos = 0;
+    // list = List.generate(_chunks, 
+    // (i) => pieces.skip(pos += 2).take(_amount).toList()[0]);
+
+    List<Piece> list = [];
+
+    for (int pass = 0; pass < 2; pass++) {
+      bool fromLeft = true;
+
+      if (pass > 0) {
+        fromLeft = false;
       }
 
-      return (result, nextPosition);
+      list = List.generate(_chunks, 
+      (i) => pieces.skip(_diagonalSkip(fromLeft, i)).take(_amount).toList()[0]);
+    }
+
+    diagonalSlice.add(list); 
+
+    return diagonalSlice;
   }
 
-  /// <summary>
-  /// Checks whether or not if a position offset by its direction is out of bounds.
-  /// </summary>
-  /// <param name="position"></param>
-  /// <param name="upperBound"></param>
-  /// <param name="row"></param>
-  /// <param name="column"></param>
-  /// <returns>True if the position is out of bounds.</returns>
-  static bool outOfBounds(Position position, int upperBound, Direction direction)
-  {
-      var offsetPosition = getOffsetPosition(position, direction);
+  ///checks if the skip is from the left, and returns a new position to skip to.
+  int _diagonalSkip(bool fromLeft, int position, [int iteration = -1]) {
+    if (fromLeft) {      
+      position = iteration * _chunks + 1;
+    }
+    else {
+      position += _chunks - 1;
+    }
 
-      return _outOfBounds(offsetPosition.row, upperBound)
-              || _outOfBounds(offsetPosition.column, upperBound);
+    return position;
   }
-
-  /// <summary>
-  /// Checks whether or not if a coordinate is out of bounds.
-  /// </summary>
-  /// <param name="position"></param>
-  /// <param name="upperBound"></param>
-  /// <returns>True if coordinate is out of bounds.</returns>
-  static bool _outOfBounds(int position, int upperBound) =>
-        0 > position || position >= upperBound;
-
-  /// <summary>
-  /// Creates a new position offset by a direction.
-  /// </summary>
-  /// <param name="position"></param>
-  /// <param name="row"></param>
-  /// <param name="column"></param>
-  /// <returns>An offset position.</returns>
-  static Position getOffsetPosition(Position position, Direction direction) 
-      => Position((position.row + direction.rowOffset).abs(),
-          (position.column + direction.columnOffset).abs());
-
-
-
-          
 
 }
+  
 
+  //chunks in sets of three:
+  //i= 0, j = 0++
+  //0 0 0
+  //0 0 0
+  //0 0 0
+
+  //som en nästlad for loop.
+  //for each List[0++][0]
+
+
+//vertical
+//col 1   col 2   col 3
+//[0][0], [0][1], [0][2]
+//[1][0], [1][1], [1][2]
+//[2][0], [2][0], [2][2]
+
+  //  List<List<int>> [
+  //                  [1, 2, 3], 
+  //                  [4, 5, 6], 
+  //                  [7, 8, 9]
+  //                           ];
+  //  
+  //  print(chunks) //[
+  //                  [1, 4, 7], 
+  //                  [2, 5, 8], 
+  //                  [3, 6, 9]
+  //                           ];
+  //
 

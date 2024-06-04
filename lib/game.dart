@@ -1,30 +1,26 @@
-//import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
-
-
-
-
+import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/position.dart';
 
 import 'piece.dart';
 
+import 'grid_checker.dart';
+
+import 'piece_type.dart';
+
 class Game {
 
-  final length = 9;
-  final List<List<Piece>> _gridList = [];
+  final List<List<Piece>> _gridBoard = [];
   final List<Piece> _gameboard = [];
+  final _gridChecker = GridChecker();
 
   PieceType turn = PieceType.cross;
 
   late Piece _currentPiece;
-  late int _currentPosition;
 
-  final hello = [[]];
-
-  int rows = 1;
-  int columns = 1;
-
-  int crosses = 0;
-  int circles = 0;
+  late int rows;
+  late int columns;
+  late int length;
+  late int _amountOfEmpties;
 
   List<PieceType> results = [];
 
@@ -33,9 +29,23 @@ class Game {
     rows = multiplier;
     columns = multiplier;
 
+    length = rows*columns;
+
+    _amountOfEmpties = length;
+
     setupBoard();
   }
 
+  /// Gets a list of all results.
+  List<PieceType> getResults() => results;
+
+  ///Gets the gameboard.
+  List<Piece> getBoard() => _gameboard;
+
+
+  /** Sets up the game board, sets all pieces to empty 
+   *  and their gridPositions to the corresponding row and column.
+   */
   void setupBoard() {
     for (int i = 0; i < length; i++) {
       _gameboard.add(Piece(PieceType.empty, i));
@@ -51,27 +61,12 @@ class Game {
           pieces[j].setGridPosition(Position(i, j));
           index++;
       }
-      _gridList.add(pieces);
+      _gridBoard.add(pieces);
     }
   }  
 
 
-
-  List<PieceType> getResults() => results;
-
-  List<Piece> getBoard() => _gameboard;
   
-
-  // /// creates a list of empty pieces.
-  // List<Piece>  createRow(int column) {
-  //   List<Piece> pieces = [];
-
-  //   for (int i = 0; i < rows; i++) {
-  //     pieces.add(Piece(PieceType.empty, i));
-  //   }
-  //   return pieces;
-  // }
-
   //updates the cell at position [x,x] to the correct type.
   bool tryPlace(int position) {
     _currentPiece =  _gameboard
@@ -88,44 +83,43 @@ class Game {
     return false;
   }
 
-  bool _isNotEmpty(Piece piece) => piece.type != PieceType.empty; 
-
+  ///checks if the piece and the pressed location is empty, if true = canPlace
   bool canPlace() =>  
     _currentPiece.type == PieceType.empty;
   
 
   void changeTurn() {
+            
+    _amountOfEmpties--;
     
-    int count = 0;
-    for (var piece in _gameboard) {
-      if (piece.type == PieceType.empty) {
-        count++;
-      }
+    PieceType test;
+    if (_amountOfEmpties < length - rows) {
+      test = _gridChecker.retrieveWinner(_gameboard, rows); 
     }
 
-    if (count == 0 || _checkWin() != PieceType.empty) {
-      _endGame();
+    if (_amountOfEmpties == 0 || _checkWin() != PieceType.empty) {
+      _resetGame();
     }
-
     
       //_checkWin();
     
-
-    if (turn == PieceType.circle) {
-      turn = PieceType.cross;
-      crosses++;
-    } else {
-      turn = PieceType.circle;
-      circles++;
-    }
+    turn = (turn == PieceType.circle) 
+    ? PieceType.cross : PieceType.circle;
+    
   }
   
-  void _endGame() {
-    for (var piece in _gameboard) {
-      piece.type = PieceType.empty;
-    }
+
+  void _resetGame() {
+    _gameboard.forEach((_resetType));
+    
+    _amountOfEmpties = length;
   }
-//skapa en gridList, gå sedan igenom gridList och gameboard och jämför dem, skiljs något, ändra den: gridList[i,j] = _gameboard[index];
+
+  void _resetType(Piece piece) {
+    piece.type = PieceType.empty;
+  }
+
+  ///skapa en gridList, gå sedan igenom gridList och gameboard och jämför dem, skiljs något, ändra den: gridList[i,j] = _gameboard[index];
   PieceType _checkWin() {
 
     var winningType = PieceType.empty;
@@ -134,7 +128,7 @@ class Game {
       int crossCount = 0;
       int circleCount = 0;
       for (int column = 0; column < 3; column++) {
-        var piece =_gridList[row][column];
+        var piece =_gridBoard[row][column];
         switch (piece.type) {
           case PieceType.circle:
             circleCount++;
@@ -166,7 +160,7 @@ class Game {
       int crossCount = 0;
       int circleCount = 0;
       for (int row = 0; row < 3; row++) {
-        var piece =_gridList[row][column];
+        var piece =_gridBoard[row][column];
         switch (piece.type) {
           case PieceType.circle:
             circleCount++;
@@ -198,7 +192,7 @@ class Game {
     for (int column = 0; column < 3; column++) {
       
       var row = column;
-        var piece =_gridList[row][column];
+        var piece =_gridBoard[row][column];
         switch (piece.type) {
           case PieceType.circle:
             circleCount++;
@@ -231,7 +225,7 @@ class Game {
     for (int column = 2; column >= 0; column--) {
       
       
-        var piece =_gridList[row][column];
+        var piece =_gridBoard[row][column];
         switch (piece.type) {
           case PieceType.circle:
             circleCount++;
@@ -290,12 +284,12 @@ class Game {
   }
 
   Piece retrieveFromGrid(Piece piece) =>
-    _gridList
+    _gridBoard
     .elementAt(piece.gridPosition[0])
     .elementAt(piece.gridPosition[1]);
 
   void updateInGrid(Piece piece) {
-    _gridList
+    _gridBoard
     .elementAt(piece.gridPosition[0])
     .elementAt(piece.gridPosition[1])
     .type = piece.type;

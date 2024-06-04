@@ -19,9 +19,7 @@ static Direction rightDown = Direction(1, 1);
 
   static List<Direction> getStraights() {
     return  [
-      left,
       right,
-      up,
       down
     ];
   }
@@ -30,8 +28,6 @@ static Direction rightDown = Direction(1, 1);
     return  [
       leftUp,
       rightUp,
-      leftDown,
-      rightDown
     ];
   }     
 }

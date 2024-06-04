@@ -1,10 +1,6 @@
 
-
-
-
+import 'piece_type.dart';
 import 'position.dart';
-
-enum PieceType { empty, circle, cross }
 
 class Piece {
 
