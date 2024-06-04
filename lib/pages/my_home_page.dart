@@ -6,9 +6,11 @@ import 'statistics_page.dart';
 
 class MyHomePage extends State<NaviBar> {
   int currentPageIndex = 0;
+  
 
   @override
   Widget build(BuildContext context) {
+
     Widget page;
 
     switch (currentPageIndex) {
@@ -21,6 +23,9 @@ class MyHomePage extends State<NaviBar> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      ),
       body: Column(
         children: [
 
@@ -31,6 +36,7 @@ class MyHomePage extends State<NaviBar> {
             ),
           ),         
           NavigationBar(
+              animationDuration: Duration(milliseconds: 1000),
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.gamepad),

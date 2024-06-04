@@ -1,17 +1,11 @@
-
-import 'package:tic_tac_toe/piece.dart';
-
-import 'game.dart';
-import 'piece_type.dart';
+import 'game_logic/piece.dart';
+import 'game_logic/game.dart';
+import 'game_logic/piece_type.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'my_home_page.dart';
-
-
-
-
+import 'pages/my_home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +22,8 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        debugShowCheckedModeBanner: false,
+        title: 'Tic Tac Toe',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
@@ -53,6 +48,7 @@ class MyAppState extends ChangeNotifier {
 static final Game _game = Game(3);
 List<Piece> gameBoard = _game.getBoard();
 List<PieceType> results = _game.getResults();
+var turnType = _game.turn;
 
 Icon getIconFromType(PieceType type) {
   const double size = 75.0;
@@ -69,37 +65,35 @@ Icon getIconFromType(PieceType type) {
   }
 
   void place(int position) {
-      var success = _game.tryPlace(position);
-      print(success);
-      print(position);
-      print(_game.turn);
+      var canPlace = _game.tryPlace(position);
+      
+      turnType = _game.turn;
       notifyListeners();   
     }
 
-    String fetchResult(int index) {
+
+  String fetchResult(int index) {
       
+    String win = 'Win';
+    String loss = 'Loss';
+
+    String cross = loss;
+    String circle = loss;
+
+    var winType = results[index];
       
-
-      String win = 'Win';
-      String loss = 'Loss';
-
-      String cross = loss;
-      String circle = loss;
-
-      var winType = results[index];
-        
-      switch (winType) {
-        case PieceType.empty:
-          break;
-        case PieceType.circle:
-          circle = win;
-          break;
-        case PieceType.cross:
-          cross = win;
-          break;
-      }
-        
-      return 'Cross: $cross | Circle: $circle';
+    switch (winType) {
+      case PieceType.empty:
+        break;
+      case PieceType.circle:
+        circle = win;
+        break;
+      case PieceType.cross:
+        cross = win;
+        break;
+    }
+      
+    return 'Cross: $cross | Circle: $circle';
     }
 }
 

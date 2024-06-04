@@ -1,5 +1,4 @@
 
-import 'dart:js_interop';
 
 import 'piece.dart';
 
@@ -47,10 +46,21 @@ class GridChecker {
     _diagonals
   ];
 
-  bool allAreOfTypeIn(List<List<Piece>> pieces, PieceType type) =>
-                            pieces.any((pieces) => 
-                            pieces.every((piece) 
-                            => piece.type == type));  
+  PieceType allAreOfTypeIn(List<List<Piece>> pieces) {                            
+    var returnType = PieceType.empty;
+
+    for (var type in _getPlayerTypes()) {
+      if (pieces.any((pieces) => pieces.every((piece) => 
+        piece.type == type))) {
+          returnType = type;
+          break;
+        }
+
+    }
+    
+    return returnType;
+  }
+                             
   
 
   PieceType checkChunks() {
@@ -58,12 +68,13 @@ class GridChecker {
     PieceType result = PieceType.empty;
 
     for (var chunks in _getAllDirections()) {
-      for (var type in _getPlayerTypes()) {
-        if (allAreOfTypeIn(chunks, type)) {
-          result = type;
-          break;
-        }    
-      }  
+      var type = allAreOfTypeIn(chunks);
+
+      if (type != PieceType.empty) {
+        result = type;
+        break;
+      }
+
     }
     
 
@@ -92,30 +103,10 @@ class GridChecker {
     return verticalSlices;
   }
 
-  //retrieves all cells in a dual diagonal cross pattern.
+  ///Retrieves all cells in a dual diagonal cross pattern.
   List<List<Piece>> diagonalChunks(List<Piece> pieces) {
+    
     List<List<Piece>> diagonalSlice = [];
-    ///en lista med två underlistor.
-    /// Behöver hamna i samma lista: [[2, 4, 6],
-    ///                               [0, 4, 8]]
-    /// 
-    /// 0
-    ///   0
-    ///     0
-    /// 
-    ///     0
-    ///   0
-    /// 0
-    /// 
-    // var list = List.generate(_chunks, 
-    // (i) => pieces.skip(i * 4).take(_amount).toList()[0]);
-
-    // diagonalSlice.add(list); 
-    // int pos = 0;
-    // list = List.generate(_chunks, 
-    // (i) => pieces.skip(pos += 2).take(_amount).toList()[0]);
-
-    List<Piece> list = [];
 
     for (int pass = 0; pass < 2; pass++) {
       bool fromLeft = true;
@@ -124,56 +115,31 @@ class GridChecker {
         fromLeft = false;
       }
 
-      list = List.generate(_chunks, 
-      (i) => pieces.skip(_diagonalSkip(fromLeft, i)).take(_amount).toList()[0]);
-    }
+      var list = List.generate(_chunks, 
+      (i) => pieces.skip(_diagonalSkip(fromLeft, i))
+                  .take(_amount)
+                  .toList()[0]);
 
     diagonalSlice.add(list); 
+    }
 
     return diagonalSlice;
   }
 
   ///checks if the skip is from the left, and returns a new position to skip to.
-  int _diagonalSkip(bool fromLeft, int position, [int iteration = -1]) {
+  int _diagonalSkip(bool fromLeft, int iteration) {
+    var skipTo = 0;
+
     if (fromLeft) {      
-      position = iteration * _chunks + 1;
+      skipTo = iteration * (_chunks + 1);
+      
     }
     else {
-      position += _chunks - 1;
+      for (int i = -1; i < iteration; i++) {
+        skipTo += (_chunks - 1);
+      }
     }
-
-    return position;
+    return skipTo;
   }
 
 }
-  
-
-  //chunks in sets of three:
-  //i= 0, j = 0++
-  //0 0 0
-  //0 0 0
-  //0 0 0
-
-  //som en nästlad for loop.
-  //for each List[0++][0]
-
-
-//vertical
-//col 1   col 2   col 3
-//[0][0], [0][1], [0][2]
-//[1][0], [1][1], [1][2]
-//[2][0], [2][0], [2][2]
-
-  //  List<List<int>> [
-  //                  [1, 2, 3], 
-  //                  [4, 5, 6], 
-  //                  [7, 8, 9]
-  //                           ];
-  //  
-  //  print(chunks) //[
-  //                  [1, 4, 7], 
-  //                  [2, 5, 8], 
-  //                  [3, 6, 9]
-  //                           ];
-  //
-

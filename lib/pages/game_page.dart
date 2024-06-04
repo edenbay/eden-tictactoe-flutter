@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/main.dart';
 
-import 'big_card.dart';
+import '../big_card.dart';
 
 class GamePage extends StatelessWidget {
   const GamePage({super.key});
@@ -17,6 +17,11 @@ class GamePage extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center, 
             children: <Widget> [
+              Padding(
+                padding: EdgeInsets.all(2.0),
+                child:  
+                    appState.getIconFromType(appState.turnType),
+                ),    
               Expanded(
                 child: GridView.builder(
                       gridDelegate: 
@@ -37,11 +42,7 @@ class GamePage extends StatelessWidget {
                           );
                       },                                
                     ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child:  Text('hello'),
-                ),                
+              ),                          
             ],                              
     );
     }

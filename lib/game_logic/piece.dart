@@ -1,12 +1,9 @@
-
 import 'piece_type.dart';
-import 'position.dart';
 
 class Piece {
 
   PieceType type = PieceType.empty;
   late int position;
-  final List<int> gridPosition = [];
 
   Piece(this.type, this.position);
 
@@ -17,15 +14,6 @@ class Piece {
   }
 
   //static PieceType getType(Piece piece) => piece.type;
-
-  void setGridPosition(Position pos) {
-
-    if (gridPosition.isEmpty) {
-      gridPosition.add(pos.row);
-      gridPosition.add(pos.column);
-    }
-    
-  }
   
 }
 

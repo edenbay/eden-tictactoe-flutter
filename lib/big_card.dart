@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/main.dart';
-import 'package:tic_tac_toe/piece.dart';
+import 'package:tic_tac_toe/game_logic/piece.dart';
 
 class BigCard extends StatelessWidget {
   const BigCard({
