@@ -1,16 +1,17 @@
-# tictactoe
+# Tic Tac Toe
 
-A new Flutter project.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## How to play
 
-A few resources to get you started if this is your first Flutter project:
+To play, simply decide on who's going to play as the cross, and who's going to play as the circle.
+Tap the box you would like to place your symbol in, and wait for your opponent to choose.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### How to win
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+To win you must occupy three continuous boxes with your own symbols in a vertical, horizontal, or diagonal line.
+Should neither of you be able to occupy three continuous boxes, the round ends in a tie.
+
+### Statistics
+
+A round ends when a player has won or there has been a tie. In both cases, the result is logged in the statistics page.
