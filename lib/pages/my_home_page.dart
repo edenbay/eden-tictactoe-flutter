@@ -6,56 +6,49 @@ import 'statistics_page.dart';
 
 class MyHomePage extends State<NaviBar> {
   int currentPageIndex = 0;
-  
 
   @override
   Widget build(BuildContext context) {
-
     Widget page;
 
     switch (currentPageIndex) {
       case 0:
-      page = const GamePage();
+        page = const GamePage();
       case 1:
-      page = const StatisticsPage();
+        page = const StatisticsPage();
       default:
-      throw UnimplementedError('no widget found for $currentPageIndex');
+        throw UnimplementedError('no widget found for $currentPageIndex');
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      ),
       body: Column(
         children: [
-
-            Expanded(
+          Expanded(
             child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).colorScheme.surfaceContainerLowest,
               child: page,
             ),
-          ),         
+          ),
           NavigationBar(
-              animationDuration: Duration(milliseconds: 1000),
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.gamepad),
-                  label: 'Tic Tac Toe',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.wysiwyg),
-                  label: 'Statistics',
-                ),
-              ],
-              selectedIndex: currentPageIndex,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  currentPageIndex = index;
-                });
-                print('selected: $index');
-                
-              },
-            ),
+            animationDuration: Duration(milliseconds: 1000),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.gamepad),
+                label: 'Tic Tac Toe',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.wysiwyg),
+                label: 'Statistics',
+              ),
+            ],
+            selectedIndex: currentPageIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                currentPageIndex = index;
+              });
+              print('selected: $index');
+            },
+          ),
         ],
       ),
     );

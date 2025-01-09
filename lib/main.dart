@@ -27,7 +27,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
               seedColor: Color.fromRGBO(119, 129, 122, 1),
-              primaryContainer: Color.fromARGB(119, 129, 122, 1)),
+              primaryContainer: Color.fromARGB(255, 76, 89, 79),
+              secondaryContainer: Color.fromARGB(255, 119, 129, 122),
+              surfaceContainerLowest: Color.fromARGB(255, 28, 31, 34)),
         ),
         home: const NaviBar(),
       ),
@@ -197,48 +199,9 @@ class Circle extends StatelessWidget {
     Color tileColor = Theme.of(context).colorScheme.primaryContainer;
 
     return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Stack(
-        alignment: AlignmentDirectional(0, 0),
-        fit: StackFit.expand,
-        children: [
-          //White circle
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border(
-                bottom: BorderSide(
-                  color: const Color.fromARGB(43, 0, 0, 0),
-                  strokeAlign: BorderSide.strokeAlignInside,
-                  width: 2,
-                ),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  offset: Offset(0, 4),
-                  color: const Color.fromRGBO(0, 0, 0, 0.25),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(22.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: tileColor,
-                shape: BoxShape.circle,
-                border: Border(
-                  top: BorderSide(
-                    color: const Color.fromARGB(43, 0, 0, 0),
-                    strokeAlign: BorderSide.strokeAlignOutside,
-                    width: 2,
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
+      padding: const EdgeInsets.all(5.0),
+      child: CustomPaint(
+        painter: CirclePainter(),
       ),
     );
   }
@@ -247,12 +210,40 @@ class Circle extends StatelessWidget {
 class CirclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(Offset.zero, 60, Paint());
+    //Center canvas
+    canvas.translate(size.width / 2, size.height / 2);
+
+    final center = [Offset.zero, Offset(0, 2), Offset(0, 7)];
+    final radius = (size.width / 3.0);
+
+    //Create circle paint
+    final circle = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width / 6.5
+      ..color = Colors.white;
+
+    //Create shadow paint
+    final shadow = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width / 6
+      ..color = Color.fromRGBO(0, 0, 0, 0.25);
+
+    //Create edge paint
+    final edge = Paint()
+      ..style = circle.style
+      ..strokeWidth = size.width / 7
+      ..color = Color.fromRGBO(186, 187, 187, 1);
+
+    //Draw shadow
+    canvas.drawCircle(center[2], radius, shadow);
+
+    //Draw edge
+    canvas.drawOval(Rect.fromLTRB(-40.5, -39.5, 41.5, 46), edge);
+
+    //Draw circle
+    canvas.drawOval(Rect.fromLTRB(-43, -43, 43, 43), circle);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    // TODO: implement shouldRepaint
-    return false;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

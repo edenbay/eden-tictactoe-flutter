@@ -11,9 +11,7 @@ class GamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var board = appState.gameBoard;
-    final customPaint = CustomPaint(
-      painter: CirclePainter(),
-    );
+    var scheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -28,14 +26,25 @@ class GamePage extends StatelessWidget {
             itemCount: board.length,
             itemBuilder: (BuildContext context, index) {
               var piece = board[index];
-              return InkWell(child: customPaint
+              Color color = (index % 2 == 0)
+                  ? scheme.secondaryContainer
+                  : scheme.primaryContainer;
+              return Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: InkWell(
+                  onTap: () => print('aj!'),
+                  child: Container(
+                    color: color,
+                    child: Circle(),
+                  ),
                   // BigCard(
                   //   key: Key('$index'),
                   // piece: piece),
                   // onTap: () {
                   //       appState.place(piece.position);
                   //     },
-                  );
+                ),
+              );
             },
           ),
         ),
