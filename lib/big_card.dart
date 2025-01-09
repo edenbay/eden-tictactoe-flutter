@@ -4,31 +4,22 @@ import 'package:tic_tac_toe/main.dart';
 import 'package:tic_tac_toe/game_logic/piece.dart';
 
 class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.piece
-  });
+  const BigCard({super.key, required this.piece});
 
-  
-final Piece piece;
+  final Piece piece;
 
   @override
   Widget build(BuildContext context) {
-var theme = Theme.of(context);
+    var theme = Theme.of(context);
 
-var appState = context.watch<MyAppState>();
-
-var style = theme.textTheme.displayMedium!.copyWith(
-  color: theme.colorScheme.onPrimary,
-);
+    var appState = context.watch<MyAppState>();
 
     return Card(
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(25.0),
-        child:
-          appState.getIconFromType(piece.getType()),
-        ),
-        );
+        child: appState.getIconFromType(piece.getType()),
+      ),
+    );
   }
 }

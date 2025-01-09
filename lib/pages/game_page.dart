@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tic_tac_toe/components/cross.dart';
 import 'package:tic_tac_toe/main.dart';
 
 import '../big_card.dart';
@@ -12,13 +13,19 @@ class GamePage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var board = appState.gameBoard;
     var scheme = Theme.of(context).colorScheme;
+
+    var currentShape = Transform.scale(
+      scale: 0.5,
+      origin: Offset(0, 0),
+      child: appState.getShapeByType(appState.turnType),
+    );
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.all(2.0),
-          child: appState.getIconFromType(appState.turnType),
-        ),
+        AppBar(
+            centerTitle: true,
+            backgroundColor: scheme.surfaceContainerLowest,
+            title: currentShape),
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -32,17 +39,11 @@ class GamePage extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: InkWell(
-                  onTap: () => print('aj!'),
+                  onTap: () => appState.place(piece.position),
                   child: Container(
                     color: color,
-                    child: Circle(),
+                    child: appState.getShapeByType(piece.type),
                   ),
-                  // BigCard(
-                  //   key: Key('$index'),
-                  // piece: piece),
-                  // onTap: () {
-                  //       appState.place(piece.position);
-                  //     },
                 ),
               );
             },
