@@ -30,14 +30,18 @@ class MyHomePage extends State<NaviBar> {
             ),
           ),
           NavigationBar(
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
             animationDuration: Duration(milliseconds: 1000),
+            indicatorColor: Colors.white,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+           
             destinations: const [
               NavigationDestination(
-                icon: Icon(Icons.gamepad),
+                icon: Icon(Icons.videogame_asset),
                 label: 'Tic Tac Toe',
               ),
               NavigationDestination(
-                icon: Icon(Icons.wysiwyg),
+                icon: Icon(),
                 label: 'Statistics',
               ),
             ],

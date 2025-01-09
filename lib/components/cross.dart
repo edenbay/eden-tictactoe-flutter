@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/components/shape.dart';
+import 'dart:math' as math;
 
 final class Cross extends Shape {
   const Cross({super.key});
@@ -11,11 +12,12 @@ final class Cross extends Shape {
       fit: StackFit.loose,
       children: [
         HalfCross(
-          rotationDegrees: -45,
+          isRotatedRight: false,
         ),
         HalfCross(
-          rotationDegrees: 45,
+          isRotatedRight: true,
         ),
+        //Used to cover the shadowed cross-section
         RotationTransition(
           turns: AlwaysStoppedAnimation(-45 / 360),
           child: Padding(
@@ -33,8 +35,8 @@ final class Cross extends Shape {
 }
 
 class HalfCross extends StatelessWidget {
-  final double rotationDegrees;
   final bool useBorders;
+  final bool isRotatedRight;
 
   BoxShadow buildShadow(double xOffset) {
     return BoxShadow(
@@ -43,45 +45,40 @@ class HalfCross extends StatelessWidget {
         blurStyle: BlurStyle.inner);
   }
 
-  Border buildBorder(bool isRotatedRight, double width) {
+  Border buildBorder(double width) {
     final borderSide = BorderSide(
       color: Color.fromRGBO(0, 0, 0, 0.25),
       width: width,
     );
 
-    return (isRotatedRight)
-        ? Border(
-            bottom: borderSide,
-            right: borderSide,
-          )
-        : Border(
-            bottom: borderSide,
-            left: borderSide,
-          );
+    return Border(
+      bottom: borderSide,
+      right: borderSide,
+    );
   }
 
-  HalfCross({super.key, required this.rotationDegrees, this.useBorders = true});
+  HalfCross({super.key, this.isRotatedRight = true, this.useBorders = true});
 
   @override
   Widget build(BuildContext context) {
-    const double threshold = 45.0;
     const double borderWidth = 2.5;
-    final isRotatedRight = rotationDegrees >= threshold;
-
-    final xOffset = isRotatedRight ? 4.0 : -4.0;
-    final border =
-        useBorders ? buildBorder(isRotatedRight, borderWidth) : Border();
+    const fortyFiveDegrees = math.pi / 4;
+    const xOffset = 4.0;
+    final border = useBorders ? buildBorder(borderWidth) : Border();
     final width = useBorders ? 20.0 : 20.0 - borderWidth;
     final List<BoxShadow> shadows = useBorders ? [buildShadow(xOffset)] : [];
 
-    return RotationTransition( //Duct-tape solution to rotating half-cross.
-      turns: AlwaysStoppedAnimation(rotationDegrees / 360), //Keeps the angle static.
-      child: Container(
-        width: width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: border,
-          boxShadow: shadows,
+    return Transform.flip(
+      flipX: !isRotatedRight,
+      child: Transform.rotate(
+        angle: fortyFiveDegrees,
+        child: Container(
+          width: width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: border,
+            boxShadow: shadows,
+          ),
         ),
       ),
     );

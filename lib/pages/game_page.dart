@@ -22,31 +22,38 @@ class GamePage extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        AppBar(
-            centerTitle: true,
-            backgroundColor: scheme.surfaceContainerLowest,
-            title: currentShape),
+        SafeArea(
+          child: SizedBox(
+            height: 50,
+            width: 50,
+            child: currentShape,
+          ),
+        ),
         Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, crossAxisSpacing: 1),
-            itemCount: board.length,
-            itemBuilder: (BuildContext context, index) {
-              var piece = board[index];
-              Color color = (index % 2 == 0)
-                  ? scheme.secondaryContainer
-                  : scheme.primaryContainer;
-              return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: InkWell(
-                  onTap: () => appState.place(piece.position),
-                  child: Container(
-                    color: color,
-                    child: appState.getShapeByType(piece.type),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, crossAxisSpacing: 1),
+              itemCount: board.length,
+              itemBuilder: (BuildContext context, index) {
+                var piece = board[index];
+                Color color = (index % 2 == 0)
+                    ? scheme.secondaryContainer
+                    : scheme.primaryContainer;
+                return Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: InkWell(
+                    onTap: () => appState.place(piece.position),
+                    child: Container(
+                      color: color,
+                      child: appState.getShapeByType(piece.type),
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],

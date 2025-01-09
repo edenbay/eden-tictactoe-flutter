@@ -28,13 +28,16 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Tic Tac Toe',
         theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromRGBO(119, 129, 122, 1),
-              primaryContainer: Color.fromARGB(255, 76, 89, 79),
-              secondaryContainer: Color.fromARGB(255, 119, 129, 122),
-              surfaceContainerLowest: Color.fromARGB(255, 28, 31, 34)),
-        ),
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Color.fromRGBO(119, 129, 122, 1),
+                primaryContainer: Color.fromARGB(255, 76, 89, 79),
+                secondaryContainer: Color.fromARGB(255, 119, 129, 122),
+                surfaceContainerLow: Color.fromARGB(255, 33, 37, 41),
+                surfaceContainerLowest: Color.fromARGB(255, 28, 31, 34)),
+            textTheme: TextTheme(
+                titleSmall:
+                    TextStyle(color: Color.fromARGB(255, 248, 249, 250)))),
         home: const NaviBar(),
       ),
     );
@@ -81,7 +84,7 @@ class MyAppState extends ChangeNotifier {
 
   void place(int position) {
     var canPlace = _game.tryPlace(position);
-    
+
     turnType = _game.turn;
     notifyListeners();
   }
