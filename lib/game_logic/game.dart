@@ -44,9 +44,8 @@ class Game {
   List<Piece> getBoard() => _gameboard;
 
 
-  /** Sets up the game board, sets all pieces to empty 
-   *  and their gridPositions to the corresponding row and column.
-   */
+  /// Sets up the game board, sets all pieces to empty
+  ///  and their gridPositions to the corresponding row and column.
   void setupBoard() {
     for (int i = 0; i < length; i++) {
       _gameboard.add(Piece(PieceType.empty, i));

@@ -11,40 +11,35 @@ class GamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var board = appState.gameBoard;
-
-
-    return 
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center, 
-            children: <Widget> [
-              Padding(
-                padding: EdgeInsets.all(2.0),
-                child:  
-                    appState.getIconFromType(appState.turnType),
-                ),    
-              Expanded(
-                child: GridView.builder(
-                      gridDelegate: 
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 1),
-                      itemCount: board.length,
-                      itemBuilder: (BuildContext context, index) {
-                        var piece = board[index];                 
-                      return InkWell(          
-                        child:    
-                        BigCard(
-                          key: Key('$index'),
-                        piece: piece),
-                        onTap: () {
-                              appState.place(piece.position);
-                            },           
-                          );
-                      },                                
-                    ),
-              ),                          
-            ],                              
+    final customPaint = CustomPaint(
+      painter: CirclePainter(),
     );
-    }
-      
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.all(2.0),
+          child: appState.getIconFromType(appState.turnType),
+        ),
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, crossAxisSpacing: 1),
+            itemCount: board.length,
+            itemBuilder: (BuildContext context, index) {
+              var piece = board[index];
+              return InkWell(child: customPaint
+                  // BigCard(
+                  //   key: Key('$index'),
+                  // piece: piece),
+                  // onTap: () {
+                  //       appState.place(piece.position);
+                  //     },
+                  );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }
