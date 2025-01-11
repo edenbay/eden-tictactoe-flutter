@@ -1,20 +1,18 @@
-import 'piece_type.dart';
+import 'enums/piece_type.dart';
 
 class Piece {
-
-  PieceType type = PieceType.empty;
+  PieceType type = PieceType.none;
   late int position;
 
   Piece(this.type, this.position);
 
-   Piece updatePiece(PieceType pieceType) {
+  Piece updatePiece(PieceType pieceType) {
     type = pieceType;
 
     return this;
   }
 
   //static PieceType getType(Piece piece) => piece.type;
-  
 }
 
 extension PieceGetter on Piece {
@@ -22,4 +20,3 @@ extension PieceGetter on Piece {
     return type;
   }
 }
-

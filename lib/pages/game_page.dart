@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/components/cross.dart';
 import 'package:tic_tac_toe/main.dart';
 
-import '../big_card.dart';
-
 class GamePage extends StatelessWidget {
   const GamePage({super.key});
 
@@ -24,35 +22,60 @@ class GamePage extends StatelessWidget {
       children: <Widget>[
         SafeArea(
           child: SizedBox(
-            height: 50,
-            width: 50,
+            height: 70,
+            width: 70,
             child: currentShape,
           ),
         ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, crossAxisSpacing: 1),
-              itemCount: board.length,
-              itemBuilder: (BuildContext context, index) {
-                var piece = board[index];
-                Color color = (index % 2 == 0)
-                    ? scheme.secondaryContainer
-                    : scheme.primaryContainer;
-                return Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: InkWell(
+            child: Container(
+              color: const Color.fromARGB(64, 255, 255, 255),
+              child: GridView.builder(
+                padding: EdgeInsets.all(0),
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, crossAxisSpacing: 1),
+                itemCount: board.length,
+                itemBuilder: (BuildContext context, index) {
+                  var piece = board[index];
+                  Color color = (index % 2 == 0)
+                      ? scheme.secondaryContainer
+                      : scheme.primaryContainer;
+                  return InkWell(
                     onTap: () => appState.place(piece.position),
-                    child: Container(
-                      color: color,
-                      child: appState.getShapeByType(piece.type),
+                    child: Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color.fromARGB(255, 23, 43, 28),
+                                  color
+                                ],
+                                stops: [
+                                  0.02,
+                                  0.05
+                                ]),
+                            border: Border.all(
+                              color: Color(0xFFFFFFFF),
+                              width: 2.0,
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              appState.getShapeByType(piece.type),
+                              Text('$index')
+                            ],
+                          )),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),

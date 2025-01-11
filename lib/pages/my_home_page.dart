@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/main.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'game_page.dart';
 import 'statistics_page.dart';
 
@@ -34,14 +34,13 @@ class MyHomePage extends State<NaviBar> {
             animationDuration: Duration(milliseconds: 1000),
             indicatorColor: Colors.white,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-           
             destinations: const [
               NavigationDestination(
-                icon: Icon(Icons.videogame_asset),
+                icon: FaIcon(FontAwesomeIcons.gamepad),
                 label: 'Tic Tac Toe',
               ),
               NavigationDestination(
-                icon: Icon(),
+                icon: FaIcon(FontAwesomeIcons.chartSimple),
                 label: 'Statistics',
               ),
             ],

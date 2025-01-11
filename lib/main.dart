@@ -1,13 +1,11 @@
-import 'dart:math';
-
 import 'package:tic_tac_toe/components/circle.dart';
 import 'package:tic_tac_toe/components/cross.dart';
 import 'package:tic_tac_toe/components/shape.dart';
 
+import 'game_logic/enums/outcome.dart';
 import 'game_logic/piece.dart';
 import 'game_logic/game.dart';
-import 'game_logic/piece_type.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'game_logic/enums/piece_type.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,22 +52,8 @@ class NaviBar extends StatefulWidget {
 class MyAppState extends ChangeNotifier {
   static final Game _game = Game(3);
   List<Piece> gameBoard = _game.getBoard();
-  List<PieceType> results = _game.getResults();
+  List<Outcome> results = _game.getResults();
   var turnType = _game.turn;
-
-  @Deprecated('Use getShapeByType() instead.')
-  Icon getIconFromType(PieceType type) {
-    const double size = 75.0;
-
-    switch (type) {
-      case PieceType.circle:
-        return const Icon(Icons.circle, size: size);
-      case PieceType.cross:
-        return const Icon(Icons.close, size: size);
-      default:
-        return const Icon(null);
-    }
-  }
 
   Shape getShapeByType(PieceType type) {
     switch (type) {
@@ -83,8 +67,8 @@ class MyAppState extends ChangeNotifier {
   }
 
   void place(int position) {
-    var canPlace = _game.tryPlace(position);
-
+    bool canPlace = _game.tryPlace(position);
+    print(canPlace);
     turnType = _game.turn;
     notifyListeners();
   }
@@ -93,19 +77,16 @@ class MyAppState extends ChangeNotifier {
     String win = 'Win';
     String loss = 'Loss';
 
-    String cross = loss;
-    String circle = loss;
+    String cross = loss, circle = loss;
 
-    var winType = results[index];
+    Outcome winType = results[index];
 
     switch (winType) {
-      case PieceType.empty:
-        break;
-      case PieceType.circle:
+      case Outcome.circle:
         circle = win;
-        break;
-      case PieceType.cross:
+      case Outcome.cross:
         cross = win;
+      default:
         break;
     }
 
