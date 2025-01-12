@@ -9,6 +9,7 @@ import 'game_logic/enums/piece_type.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'game_logic/result.dart';
 import 'pages/my_home_page.dart';
 
 void main() {
@@ -53,6 +54,9 @@ class MyAppState extends ChangeNotifier {
   static final Game _game = Game(3);
   List<Piece> gameBoard = _game.getBoard();
   List<Outcome> results = _game.getResults();
+  late Result result;
+  late bool isGameOver = false;
+  late bool isWin = false;
   var turnType = _game.turn;
 
   Shape getShapeByType(PieceType type) {
@@ -71,9 +75,9 @@ class MyAppState extends ChangeNotifier {
     print(canPlace);
     if (canPlace != Outcome.none) {
       Future.delayed(Duration(milliseconds: 1500), () {
+        //show graphic
         print('resetting');
         _game.resetGame();
-
       }).whenComplete(callNextRound);
     } //needs two callNextRound calls otherwise it updates wrong.
 
@@ -82,6 +86,9 @@ class MyAppState extends ChangeNotifier {
 
   void callNextRound() {
     turnType = _game.turn;
+    result = _game.result;
+    isGameOver = result.isGameOver;
+    isWin = result.isWin;
     notifyListeners();
   }
 

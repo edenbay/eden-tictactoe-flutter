@@ -73,6 +73,7 @@ class Game {
   void resetGame() {
     _gameboard.forEach((_resetType));
     turn = PieceType.cross;
+    result = Result(outcome: Outcome.none);
   }
 
   void _resetType(Piece piece) {

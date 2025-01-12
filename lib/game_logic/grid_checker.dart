@@ -68,9 +68,9 @@ class GridChecker {
 
   (Piece?, Piece?) getFirstAndLastIfAllSame(List<Piece> pieces) {
     (Piece?, Piece?) output = (null, null);
-    
+
     if (pieces.length < 3) {
-        return output;
+      return output;
     }
 
     _getPlayerTypes().forEach((type) {
@@ -86,27 +86,32 @@ class GridChecker {
   bool allAre(List<Piece> pieces, PieceType type) =>
       pieces.every((p) => p.type == type);
 
-  (Piece, Piece) getFirstAndLastOf(List<Piece> pieces) => 
+  (Piece, Piece) getFirstAndLastOf(List<Piece> pieces) =>
       (pieces.first, pieces.last);
 
   ///Gets a list of the pieces in row
   List<Piece> getHorizontal(int row) {
-        int a = row*3, b = a + 1, c = b + 1;
-    return [_pieces[a], _pieces[b], _pieces[c]];
+    return createChunk(row * 3, 1);
   }
 
   ///Gets a list of the pieces in column
   List<Piece> getVertical(int column) {
-    int a = column, b = a + 3, c = b + 3;
-    return [_pieces[a], _pieces[b], _pieces[c]];
+    return createChunk(column, 3);
   }
 
   ///Gets a list of the pieces in diagonal from start or end
   List<Piece> getDiagonal(bool fromStart) {
-    var _full = (fromStart) ? _pieces : _pieces.reversed;
-    int a = 0, b = a + 4, c = b + 4;
+    var full = (fromStart) ? _pieces : _pieces.sublist(2);
+    int accumulator = (fromStart) ? 4 : 2;
+
+    return createChunk(full.first.position, accumulator);
+  }
+
+  List<Piece> createChunk(int start, int accumulator) {
+    int a = start, b = a + accumulator, c = b + accumulator;
     return [_pieces[a], _pieces[b], _pieces[c]];
   }
+
   ///Returns true if all pieces are filled
   bool _allFilled() => !_pieces.any((p) => p.type == PieceType.none);
 }
