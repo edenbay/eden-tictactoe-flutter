@@ -67,8 +67,20 @@ class MyAppState extends ChangeNotifier {
   }
 
   void place(int position) {
-    bool canPlace = _game.tryPlace(position);
+    var canPlace = _game.tryPlace(position);
     print(canPlace);
+    if (canPlace != Outcome.none) {
+      Future.delayed(Duration(milliseconds: 1500), () {
+        print('resetting');
+        _game.resetGame();
+
+      }).whenComplete(callNextRound);
+    } //needs two callNextRound calls otherwise it updates wrong.
+
+    callNextRound();
+  }
+
+  void callNextRound() {
     turnType = _game.turn;
     notifyListeners();
   }
