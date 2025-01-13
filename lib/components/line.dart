@@ -18,46 +18,92 @@ class WinLine extends StatelessWidget {
   }
 }
 
+enum _Direction { down, right, diagLeft, diagRight }
+
+enum _Place { first, second, last }
+
 class LinePainter extends CustomPainter {
   late final double rotation;
-  late final ({double x, double y}) offset;
   late final double length;
+  late final _Direction _direction;
+  late final _Place? _place;
+  late final int first;
   //om first - last == 6 nedåt
   //om first - last == 2 höger
   //om first - last == 4 diagvän
   //om first - last == 8 diaghög
 
-  //y 10.0 y -65.0 nedåt
-  //x 30.0 y 0.0 diaghög
-  //x 10.0 y 65.0 höger
-
-  LinePainter({int first = 1, int last = 7}) {
-    offset = (x: 0.0, y: 0.0);
+  LinePainter({int first = 2, int last = 6}) {
+    this.first = first;
+    constructLine(first, last);
+    setPlacement();
   }
 
   void constructLine(int first, int last) {
+    _direction = _getDirection(first, last);
+    switch (_direction) {
+      case _Direction.down:
+        rotation = math.pi / 2; //90*
+        break;
+      case _Direction.right:
+        rotation = 0; //0*
+        break;
+      case _Direction.diagLeft:
+        rotation = math.pi / -4; //-45*
+        break;
+      case _Direction.diagRight:
+        rotation = math.pi / 4; //45*
+        break;
+    }
+  }
+
+  void setPlacement() {
+    switch (first) {
+      case 0:
+        if (_direction == _Direction.right) _place = _Place.first;
+        if (_direction == _Direction.down) _place = _Place.last;
+
+        break;
+      case 1:
+        if (_direction == _Direction.down) _place = _Place.second;
+        break;
+      case 2:
+        if (_direction == _Direction.down) _place = _Place.first;
+      case 3:
+        if (_direction == _Direction.right) _place = _Place.second;
+        break;
+      case 6:
+        if (_direction == _Direction.right) _place = _Place.last;
+        break;
+      default:
+        _place = null;
+    }
+  }
+
+  _Direction _getDirection(int first, int last) {
     int difference = (first - last).abs();
 
     switch (difference) {
       case 6:
-        offset = (x: 10.0, y: -65.0);
-        rotation = math.pi / 2;
-        // offset = (x: ,y: );
-        // offset = (x: ,y: );
-        // offset = (x: ,y: );
-        break;
+        return _Direction.down;
       case 2:
-        offset = (x: 10.0, y: -65.0);
-        rotation = 0;
-      default:
+        return _Direction.right;
+      case 4:
+        return _Direction.diagLeft;
+      case 8:
+        return _Direction.diagRight;
     }
+    throw Error.safeToString(
+        'No value corresponding with $difference found for $_Direction');
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    double rotation = 0;//math.pi / 2;
+    bool shouldRotate = (_direction != _Direction.right);
+
     bool isDiag = (rotation.abs() == math.pi / 4);
     double length = isDiag ? 750.0 : 550.0;
+
     var paint = Paint()
       ..color = Color(0xFFFFFFFF)
       ..strokeWidth = 20.0;
@@ -67,18 +113,39 @@ class LinePainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     var shadow = Paint.from(edge)..strokeWidth = 4.0;
+
     double centerX = size.width / 2;
     double centerY = size.height / 2;
-    rotate(canvas, centerX, centerY, rotation);
 
-    //for cols: rotate(canvas, centerX, centerY, math.pi / 2);
-    //canvas.translate(0, centerX-centerX-centerX/1.5); // for col/row 3
-    //canvas.translate(0, centerX/1.5); // for col/row 1
-    //canvas.translate(0, 0); // for col/row 2
+    if (shouldRotate) {
+      rotate(canvas, centerX, centerY, rotation);
+    }
+    if (!isDiag) {
+      handlePlacement(shouldRotate, canvas, centerX);
+    }
 
-    drawCentered(canvas, centerX, centerY, length, 0, paint);
-    drawCentered(canvas, centerX, centerY, length, 9, edge);
-    drawCentered(canvas, centerX, centerY, length, 12, shadow);
+    drawCentered(canvas, centerX, centerY, length, 0, paint); // line
+    drawCentered(canvas, centerX, centerY, length, 9, edge); // edge
+    drawCentered(canvas, centerX, centerY, length, 12, shadow); // shadow
+  }
+
+  void handlePlacement(bool shouldRotate, Canvas canvas, double centerX) {
+    if (_place == null) { 
+      return;
+    }
+
+    bool isFirstPlace = shouldRotate && _place == _Place.first ||
+        !shouldRotate && _place == _Place.first;
+
+    bool isLastPlace = shouldRotate && _place == _Place.last ||
+        !shouldRotate && _place == _Place.last;
+
+    if (isFirstPlace) {
+      canvas.translate(0, centerX - centerX - centerX / 1.5);
+    }
+    if (isLastPlace) {
+      canvas.translate(0, centerX / 1.5);
+    }
   }
 
   void drawCentered(Canvas canvas, double centerX, double centerY, double len,
