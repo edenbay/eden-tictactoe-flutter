@@ -54,7 +54,7 @@ class MyAppState extends ChangeNotifier {
   static final Game _game = Game(3);
   List<Piece> gameBoard = _game.getBoard();
   List<Outcome> results = _game.getResults();
-  late Result result;
+  late Result result = Result(outcome: Outcome.none);
   late bool isGameOver = false;
   late bool isWin = false;
   var turnType = _game.turn;

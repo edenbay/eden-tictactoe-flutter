@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class WinLine extends StatelessWidget {
-  const WinLine({super.key});
+  List<int>? points;
+
+  bool isWin;
+
+  WinLine(
+      {super.key, required bool this.isWin, required List<int>? this.points});
 
   @override
   Widget build(BuildContext context) {
-    var key = context;
-    print(key);
-    return SizedBox(
-      height: 395,
-      width: 393,
-      child: CustomPaint(
-        painter: LinePainter(),
-      ),
-    );
+    return isWin
+        ? CustomPaint(
+            painter: LinePainter(first: points!.first, last: points!.last),
+          )
+        : Container();
   }
 }
 
@@ -28,12 +29,13 @@ class LinePainter extends CustomPainter {
   late final _Direction _direction;
   late final _Place? _place;
   late final int first;
+  double currentLength = 0;
   //om first - last == 6 nedåt
   //om first - last == 2 höger
   //om first - last == 4 diagvän
   //om first - last == 8 diaghög
 
-  LinePainter({int first = 2, int last = 6}) {
+  LinePainter({int first = 3, int last = 5}) {
     this.first = first;
     constructLine(first, last);
     setPlacement();
@@ -44,16 +46,12 @@ class LinePainter extends CustomPainter {
     switch (_direction) {
       case _Direction.down:
         rotation = math.pi / 2; //90*
-        break;
       case _Direction.right:
         rotation = 0; //0*
-        break;
       case _Direction.diagLeft:
         rotation = math.pi / -4; //-45*
-        break;
       case _Direction.diagRight:
         rotation = math.pi / 4; //45*
-        break;
     }
   }
 
@@ -63,18 +61,14 @@ class LinePainter extends CustomPainter {
         if (_direction == _Direction.right) _place = _Place.first;
         if (_direction == _Direction.down) _place = _Place.last;
 
-        break;
       case 1:
         if (_direction == _Direction.down) _place = _Place.second;
-        break;
       case 2:
         if (_direction == _Direction.down) _place = _Place.first;
       case 3:
         if (_direction == _Direction.right) _place = _Place.second;
-        break;
       case 6:
         if (_direction == _Direction.right) _place = _Place.last;
-        break;
       default:
         _place = null;
     }
@@ -102,7 +96,7 @@ class LinePainter extends CustomPainter {
     bool shouldRotate = (_direction != _Direction.right);
 
     bool isDiag = (rotation.abs() == math.pi / 4);
-    double length = isDiag ? 750.0 : 550.0;
+    double maxLength = isDiag ? 750.0 : 550.0;
 
     var paint = Paint()
       ..color = Color(0xFFFFFFFF)
@@ -112,7 +106,9 @@ class LinePainter extends CustomPainter {
       ..color = Color(0x25000000)
       ..strokeWidth = 2.0;
 
-    var shadow = Paint.from(edge)..strokeWidth = 4.0;
+    var shadow = Paint()
+      ..color = Color(0x25000000)
+      ..strokeWidth = 4.0;
 
     double centerX = size.width / 2;
     double centerY = size.height / 2;
@@ -124,13 +120,19 @@ class LinePainter extends CustomPainter {
       handlePlacement(shouldRotate, canvas, centerX);
     }
 
-    drawCentered(canvas, centerX, centerY, length, 0, paint); // line
-    drawCentered(canvas, centerX, centerY, length, 9, edge); // edge
-    drawCentered(canvas, centerX, centerY, length, 12, shadow); // shadow
+    drawCentered(canvas, centerX, centerY, currentLength, 0, paint); // line
+    drawCentered(canvas, centerX, centerY, currentLength, 9, edge); // edge
+    drawCentered(canvas, centerX, centerY, currentLength, 12, shadow); // shadow
+
+    if (currentLength < maxLength) {
+      currentLength += 70;
+    } else {
+      currentLength = maxLength;
+    }
   }
 
   void handlePlacement(bool shouldRotate, Canvas canvas, double centerX) {
-    if (_place == null) { 
+    if (_place == null) {
       return;
     }
 
@@ -161,5 +163,6 @@ class LinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(LinePainter oldDelegate) =>
+      oldDelegate.currentLength != currentLength;
 }
