@@ -107,16 +107,11 @@ class GameGrid extends StatelessWidget {
                       colors: [Color.fromARGB(255, 23, 43, 28), color],
                       stops: [0.02, 0.05]),
                   border: Border.all(
-                    color: Color.fromARGB(255, 170, 170, 170),
+                    color: Color.fromARGB(255, 204, 204, 204),
                     width: 2.5,
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    appState.getShapeByType(piece.type),
-                    Text('$index')
-                  ],
-                )),
+                child: appState.getShapeByType(piece.type)),
           ),
         );
       },

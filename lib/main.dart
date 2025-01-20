@@ -91,7 +91,7 @@ class MyAppState extends ChangeNotifier {
     isWin = result.isWin;
     notifyListeners();
   }
-
+  @deprecated
   String fetchResult(int index) {
     String win = 'Win';
     String loss = 'Loss';
