@@ -1,4 +1,4 @@
-# Tic Tac Toe
+9# Tic Tac Toe
 
 
 
@@ -19,4 +19,8 @@ Should neither of you be able to occupy three continuous boxes, the round ends i
 
 A round ends when a player has won or there has been a tie. In both cases, the result is logged in the statistics page.
 
-![tictactoe2](https://github.com/user-attachments/assets/7774fd34-2d12-400a-b1b1-4073f3fbab7e)
+![tic-tac-toe-statistics.jpg](https://github.com/user-attachments/assets/4713c9ad-7495-466e-812b-72c7247fe641)
+
+
+
+
