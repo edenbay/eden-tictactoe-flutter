@@ -8,7 +8,7 @@ To play, simply decide on who's going to play as the cross, and who's going to p
 Tap the box you would like to place your symbol in, and wait for your opponent to choose.
 
 
-![tic-tac-toe-gameplay.gif](https://github.com/user-attachments/assets/b3d24d74-1c66-4dda-abcc-2525abb1f742
+![tic-tac-toe-gameplay.gif](https://github.com/user-attachments/assets/b3d24d74-1c66-4dda-abcc-2525abb1f742)
 
 ### How to win
 
